@@ -1,7 +1,11 @@
 package shop.mtcoding.blog._core.errors;
 
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import shop.mtcoding.blog._core.errors.exception.*;
@@ -11,33 +15,28 @@ import shop.mtcoding.blog._core.utils.ApiUtil;
 @RestControllerAdvice // 데이터 응답
 public class MyExceptionHandler {
 
-    @ExceptionHandler(Exception400.class)
-    public ResponseEntity<?> ex400(Exception400 e){
-        ApiUtil<?> apiUtil = new ApiUtil<>(400, e.getMessage()); // http body -> 구성한 객체
-        return new ResponseEntity<>(apiUtil, HttpStatus.BAD_REQUEST); // http body, http header
-    }
+    @Before("@annotation(org.springframework.web.bind.annotation.PostMapping) || @annotation(org.springframework.web.bind.annotation.PutMapping)")
+    public void hello(JoinPoint jp){
+        Object[] args = jp.getArgs(); // 파라메터(매개변수)
+        System.out.println("크기 : "+args.length);
 
-    @ExceptionHandler(Exception401.class)
-    public ResponseEntity<?> ex401(Exception401 e){
-        ApiUtil<?> apiUtil = new ApiUtil<>(401, e.getMessage());
-        return new ResponseEntity<>(apiUtil, HttpStatus.UNAUTHORIZED);
-    }
+        for(Object arg : args){
 
-    @ExceptionHandler(Exception403.class)
-    public ResponseEntity<?> ex403(Exception403 e){
-        ApiUtil<?> apiUtil = new ApiUtil<>(403, e.getMessage());
-        return new ResponseEntity<>(apiUtil, HttpStatus.FORBIDDEN);
-    }
+            if(arg instanceof Errors){
+                Errors errors = (Errors) arg;
 
-    @ExceptionHandler(Exception404.class)
-    public ResponseEntity<?> ex404(Exception404 e){
-        ApiUtil<?> apiUtil = new ApiUtil<>(404, e.getMessage());
-        return new ResponseEntity<>(apiUtil, HttpStatus.NOT_FOUND);
-    }
+                if(errors.hasErrors()){
+                    for (FieldError error : errors.getFieldErrors()){
+                        System.out.println(error.getField());
+                        System.out.println(error.getDefaultMessage());
 
-    @ExceptionHandler(Exception500.class)
-    public ResponseEntity<?> ex500(Exception500 e){
-        ApiUtil<?> apiUtil = new ApiUtil<>(500, e.getMessage());
-        return new ResponseEntity<>(apiUtil, HttpStatus.INTERNAL_SERVER_ERROR);
+                        throw new Exception400(error.getDefaultMessage()+" : "+error.getField());
+                    }
+                }
+            }
+
+        }
+
+        System.out.println("MyValidationHandler : 🧡💛💚💜🤎🖤💖💗💓💞💕❣💔🤍💘💝");
     }
 }

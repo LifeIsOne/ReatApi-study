@@ -3,7 +3,10 @@ package shop.mtcoding.blog.board;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import shop.mtcoding.blog._core.errors.exception.Exception400;
 import shop.mtcoding.blog._core.utils.ApiUtil;
 import shop.mtcoding.blog.user.User;
 
@@ -23,7 +26,6 @@ public ResponseEntity<?> main(){
     return ResponseEntity.ok(new ApiUtil(boardList));
 }
 
-    // TODO: 글상세보기 API 필요 -> @GetMapping("/api/boards/{id}/detail")
     @GetMapping("/api/boards/{id}/detail")
     public ResponseEntity<?> detail(@PathVariable Integer id){
         User sessionUser = (User) session.getAttribute("sessionUser");
@@ -31,7 +33,6 @@ public ResponseEntity<?> main(){
         return ResponseEntity.ok(new ApiUtil(resDTO));
     }
 
-    // TODO: 글조회 API 필요 -> @GetMapping("/api/boards/{id}")
     @GetMapping("/api/boards/{id}")
     public ResponseEntity<?> findOne(@PathVariable Integer id){
         Board board = boardService.글조회(id);
@@ -39,7 +40,17 @@ public ResponseEntity<?> main(){
     }
 
     @PostMapping("/api/boards")
-    public ResponseEntity<?> save(@RequestBody BoardRequest.SaveDTO reqDTO) {
+    public ResponseEntity<?> save(@RequestBody BoardRequest.SaveDTO reqDTO, Errors errors) {
+
+        if(errors.hasErrors()){
+            for (FieldError error : errors.getFieldErrors()){
+                System.out.println(error.getField());
+                System.out.println(error.getDefaultMessage());
+
+                throw new Exception400(error.getDefaultMessage()+" : "+error.getField());
+            }
+        }
+
         User sessionUser = (User) session.getAttribute("sessionUser");
         Board board = boardService.글쓰기(reqDTO, sessionUser);
         return ResponseEntity.ok(new ApiUtil(board));
