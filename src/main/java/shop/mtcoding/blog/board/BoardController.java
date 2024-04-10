@@ -16,21 +16,24 @@ public class BoardController {
     private final BoardService boardService;
     private final HttpSession session;
 
-    @PostMapping("/board/save")
+    // todo : 게시글 목록
+    // todo : 게시글 상세
+
+    @PostMapping("/api/boards")
     public String save(BoardRequest.SaveDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         boardService.글쓰기(reqDTO, sessionUser);
         return "redirect:/";
     }
 
-    @PostMapping("/board/{id}/update")
+    @PutMapping("/api/boards/{id}")
     public String update(@PathVariable Integer id, BoardRequest.UpdateDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         boardService.글수정(id, sessionUser.getId(), reqDTO);
         return "redirect:/board/" + id;
     }
 
-    @PostMapping("/board/{id}/delete")
+    @PostMapping("/api/board/{id}")
     public String delete(@PathVariable Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         boardService.글삭제(id, sessionUser.getId());
