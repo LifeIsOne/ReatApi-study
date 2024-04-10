@@ -10,19 +10,16 @@ import java.util.List;
 public class BoardResponse {
 
     @Data
-    public static class DTO {
+    public static class MainDTO {
         private int id;
         private String title;
-        private String content;
 
-        public DTO(Board board) {
+        public MainDTO(Board board) {
             this.id = board.getId();
             this.title = board.getTitle();
-            this.content = board.getContent();
         }
     }
 
-    // 게시글 상세보기 화면
     @Data
     public static class DetailDTO {
         private int id;
@@ -38,7 +35,7 @@ public class BoardResponse {
             this.title = board.getTitle();
             this.content = board.getContent();
             this.userId = board.getUser().getId();
-            this.username = board.getUser().getUsername(); // join 해서 가져왔음
+            this.username = board.getUser().getUsername();
             this.isOwner = false;
             if(sessionUser != null){
                 if(sessionUser.getId() == userId) isOwner = true;
@@ -56,27 +53,15 @@ public class BoardResponse {
             private boolean isOwner;
 
             public ReplyDTO(Reply reply, User sessionUser) {
-                this.id = reply.getId(); // lazy loading 발동
+                this.id = reply.getId();
                 this.comment = reply.getComment();
                 this.userId = reply.getUser().getId();
-                this.username = reply.getUser().getUsername(); // lazy loading 발동 (in query)
+                this.username = reply.getUser().getUsername(); // lazy loading 발동
                 this.isOwner = false;
                 if(sessionUser != null){
                     if(sessionUser.getId() == userId) isOwner = true;
                 }
             }
-        }
-    }
-
-    // 게시글 목록보기 화면
-    @Data
-    public static class MainDTO {
-        private int id;
-        private String title;
-
-        public MainDTO(Board board) {
-            this.id = board.getId();
-            this.title = board.getTitle();
         }
     }
 }
