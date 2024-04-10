@@ -30,41 +30,10 @@ public class BoardController {
         return "redirect:/board/" + id;
     }
 
-    @GetMapping("/board/{id}/update-form")
-    public String updateForm(@PathVariable Integer id, HttpServletRequest request) {
-        Board board = boardService.글조회(id);
-        request.setAttribute("board", board);
-        return "board/update-form";
-    }
-
     @PostMapping("/board/{id}/delete")
     public String delete(@PathVariable Integer id) {
         User sessionUser = (User) session.getAttribute("sessionUser");
         boardService.글삭제(id, sessionUser.getId());
         return "redirect:/";
     }
-
-    @GetMapping("/")
-    public String index(HttpServletRequest request) {
-        List<Board> boardList = boardService.글목록조회();
-        request.setAttribute("boardList", boardList);
-        return "index";
-    }
-
-    @GetMapping("/board/save-form")
-    public String saveForm() {
-        return "board/save-form";
-    }
-
-    // SSR은 DTO를 굳이 만들필요가 없다. 필요한 데이터만 랜더링해서 클라이언트에게 전달할것이니까!!
-    @GetMapping("/board/{id}")
-    public String detail(@PathVariable Integer id, HttpServletRequest request) {
-        User sessionUser = (User) session.getAttribute("sessionUser");
-        Board board = boardService.글상세보기(id, sessionUser);
-
-        request.setAttribute("board", board);
-        System.out.println("서버 사이드 렌더링 직전에는 Board와 User만 조회된 상태이다~~~~~~~~~~~~~~");
-        return "board/detail";
-    }
-
 }
