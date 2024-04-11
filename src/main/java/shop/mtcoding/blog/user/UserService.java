@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shop.mtcoding.blog._core.errors.exception.Exception400;
 import shop.mtcoding.blog._core.errors.exception.Exception401;
 import shop.mtcoding.blog._core.errors.exception.Exception404;
+import shop.mtcoding.blog._core.utils.JwtUtil;
 
 import java.util.Optional;
 
@@ -31,11 +32,12 @@ public class UserService {
         return new UserResponse.DTO(user);
     }
     
-    public User 로그인(UserRequest.LoginDTO reqDTO){
-        User sessionUser = userJPARepository.findByUsernameAndPassword(reqDTO.getUsername(), reqDTO.getPassword())
-                .orElseThrow(() -> new Exception401("인증되지 않았습니다"));
-        return sessionUser;
-    }
+public String 로그인(UserRequest.LoginDTO reqDTO){
+    User user = userJPARepository.findByUsernameAndPassword(reqDTO.getUsername(), reqDTO.getPassword())
+            .orElseThrow(() -> new Exception401("인증되지 않았습니다"));
+    String jwt = JwtUtil.create(user);
+    return jwt;
+}
 
     @Transactional
     public User 회원가입(UserRequest.JoinDTO reqDTO){ // ssar

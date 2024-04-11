@@ -43,9 +43,9 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserRequest.LoginDTO reqDTO) {
-        User sessionUser = userService.로그인(reqDTO);
-        session.setAttribute("sessionUser", sessionUser);
-        return ResponseEntity.ok(new ApiUtil(null));
+        String jwt = userService.로그인(reqDTO);
+        return ResponseEntity.ok().header("Authorization", "Barer " + jwt)
+                .body(new ApiUtil(null));
     }
 
     @GetMapping("/logout")

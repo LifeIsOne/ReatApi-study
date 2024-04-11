@@ -41,8 +41,9 @@ public ResponseEntity<?> main(){
     @PostMapping("/api/boards")
     public ResponseEntity<?> save(@RequestBody BoardRequest.SaveDTO reqDTO) {
         User sessionUser = (User) session.getAttribute("sessionUser");
-        Board board = boardService.글쓰기(reqDTO, sessionUser);
-        return ResponseEntity.ok(new ApiUtil(board));
+        String jwt = boardService.글쓰기(reqDTO, sessionUser);
+        return ResponseEntity.ok().header("Authorization", "Barer " + jwt)
+                .body(new ApiUtil(null));
     }
 
     @PutMapping("/api/boards/{id}")
